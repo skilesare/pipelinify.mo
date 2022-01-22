@@ -1,0 +1,31 @@
+{
+  "canisters": {
+    
+    "pipelinify_testRunner": {
+      "main": "tests/_pipelinifyTest-Runner.mo",
+      "type": "motoko"
+    },
+    "pipelinify_testConsumer": {
+      "main": "tests/_pipelinifyTest-Consumer.mo",
+      "type": "motoko"
+    },
+    "pipelinify_testProcessor": {
+      "main": "tests/_pipelinifyTest-Processor.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": "vessel sources"
+    }
+  },
+  "dfx": "0.8.3",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}
