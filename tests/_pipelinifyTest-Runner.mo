@@ -9,12 +9,12 @@
 //THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ///////////////////////////////
 
-
 import Array "mo:base/Array";
 import Nat "mo:base/Nat";
 import Pipelinify "../src";
 import PipelinifyTypes "../src/types";
-import Candy "mo:candy";
+import Candy "mo:candy/types";
+import Conversion "mo:candy/conversion";
 import Hash "mo:base/Hash";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
@@ -59,7 +59,7 @@ actor class pipelinify_runner(){
         testStream #= "Testing Full Data Send - ";
 
         let testFullDataSendResponse = await consumer.testFullDataSendProcess([(0,0,#Bytes(#thawed([0,1,2,3])))]);
-        let tester5 = Candy.valueToBytes(testFullDataSendResponse[0].2);
+        let tester5 = Conversion.valueToBytes(testFullDataSendResponse[0].2);
 
         if(tester5[0] == 4 and tester5[1] == 5 and tester5[2] == 6 and tester5[3] == 7){
             testStream #= "✓\n";
@@ -76,7 +76,7 @@ actor class pipelinify_runner(){
         testStream #= "Testing Pull Full Data - ";
 
         let testPullFullResponse = await consumer.testPullFullProcess();
-        let tester4 = Candy.valueToBytes(testPullFullResponse[0].2);
+        let tester4 = Conversion.valueToBytes(testPullFullResponse[0].2);
 
         if(tester4[0] == 3 and tester4[1] == 3 and tester4[2] == 4 and tester4[3] == 4){
             testStream #= "✓\n";
@@ -92,7 +92,7 @@ actor class pipelinify_runner(){
         testStream #= "Testing Pull Chunk Data - ";
 
         let testPullChunkResponse = await consumer.testPullChunkProcess();
-        let tester3 = Candy.valueToBytes(testPullChunkResponse[7].2);
+        let tester3 = Conversion.valueToBytes(testPullChunkResponse[7].2);
 
         Debug.print(debug_show(testPullChunkResponse));
 
@@ -110,7 +110,7 @@ actor class pipelinify_runner(){
         testStream #= "Testing Pull Chunk Data Unknown Size - ";
 
         let testPullChunkUnknownResponse = await consumer.testPullChunkUnknownProcess();
-        let tester2 = Candy.valueToBytes(testPullChunkUnknownResponse[0].2);
+        let tester2 = Conversion.valueToBytes(testPullChunkUnknownResponse[0].2);
 
         if(tester2[0] == 6 and tester2[1] == 6 and tester2[2] == 6 and tester2[3] == 6){
             testStream #= "✓\n";
@@ -126,7 +126,7 @@ actor class pipelinify_runner(){
         testStream #= "Testing Pull Full Data via Query - ";
 
         let testPullFullQueryResponse = await consumer.testPullFullQueryResponse();
-        let tester1 = Candy.valueToBytes(testPullFullQueryResponse[0].2);
+        let tester1 = Conversion.valueToBytes(testPullFullQueryResponse[0].2);
 
 
         if(tester1[0] == 22 and tester1[1] == 23 and tester1[2] == 24 and tester1[3] == 25){
@@ -143,7 +143,7 @@ actor class pipelinify_runner(){
         testStream #= "Testing Push Data - Full - ";
 
         let testPushFullResponse = await consumer.testPushFullResponse();
-        let tester = Candy.valueToBytes(testPushFullResponse[0].2);
+        let tester = Conversion.valueToBytes(testPushFullResponse[0].2);
 
         if(tester[0] == 5 and tester[1] == 4 and tester[2] == 3 and tester[3] == 2){
             testStream #= "✓\n";

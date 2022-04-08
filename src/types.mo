@@ -22,7 +22,7 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import String "mo:base/Text";
 import Text "mo:base/Text";
-import Candy "mo:candy";
+import Candy "mo:candy/types";
 
 
 module {

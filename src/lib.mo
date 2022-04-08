@@ -19,7 +19,8 @@ import Nat64 "mo:base/Nat64";
 import Nat "mo:base/Nat";
 import Result "mo:base/Result";
 import PipelinifyTypes "types";
-import Candy "mo:candy";
+import Candy "mo:candy/types";
+import Workspace "mo:candy/workspace";
 import Debug "mo:base/Debug";
 import Buffer "mo:base/Buffer";
 import Hash "mo:base/Hash";
@@ -200,7 +201,7 @@ module {
             case(null){
                 func _getLocalWorkspace(_hash : PipeInstanceID, _id : Nat, _request: ?PipelinifyTypes.ProcessRequest) : Candy.Workspace{
                     //just returns what it was given
-                    return Candy.emptyWorkspace();
+                    return Workspace.emptyWorkspace();
 
                 }
             };
@@ -213,7 +214,7 @@ module {
             case(null){
                 func _putLocalWorkspacee(_hash : PipeInstanceID, _id : Nat, _workspace: Candy.Workspace, _request: ?PipelinifyTypes.ProcessRequest) : Candy.Workspace{
                     //just returns what it was given
-                    return Candy.emptyWorkspace();
+                    return Workspace.emptyWorkspace();
 
                 }
             };
@@ -317,7 +318,7 @@ module {
                             let dataWillBeReturnedResponse = onDataWillBeReturned(pipeInstanceID, finalData, ?_request);
                             let processResponse =
                                 #dataIncluded{
-                                    payload = Candy.workspaceToAddressedChunkArray(finalData);
+                                    payload = Workspace.workspaceToAddressedChunkArray(finalData);
                                 };
                             let dataReturnedResponse : PipelinifyTypes.PipelineEventResponse = onDataReturned(pipeInstanceID, ?_request, ?processResponse);
 
@@ -365,7 +366,7 @@ module {
             let pipeInstanceID = getPipeInstanceID(_request);
 
             Debug.print("the process is on");
-            var thisWorkspace = Candy.emptyWorkspace();
+            var thisWorkspace = Workspace.emptyWorkspace();
 
 
 
@@ -389,7 +390,7 @@ module {
                     let dataWillLoadResponse = onDataWillBeLoaded(pipeInstanceID, ?_request);
                     //todo: chunk data into workspace
 
-                    thisWorkspace := Candy.fromAddressedChunks(dataIncludedRequest.data);
+                    thisWorkspace := Workspace.fromAddressedChunks(dataIncludedRequest.data);
                     Debug.print("workspace included" # debug_show(thisWorkspace.size()));
                     let dataResponse : PipelinifyTypes.PipelineEventResponse = onDataReady(pipeInstanceID, thisWorkspace, ?_request);
                 };
@@ -405,7 +406,7 @@ module {
                             Debug.print("initilizing cache with no data");
                             workspaceCache.put(pipeInstanceID, {
                                 var status = #initialized;
-                                data = Candy.emptyWorkspace();
+                                data = Workspace.emptyWorkspace();
                             });
                             bInitilized := true;
                         };
@@ -413,7 +414,7 @@ module {
                             Debug.print("initilizing cache with data");
                             bInitilized := true;
                             bLoading := true;
-                            Candy.fileAddressedChunks(thisWorkspace, data);
+                            Workspace.fileAddressedChunks(thisWorkspace, data);
                             chunkCount := 1;
                         };
                     };
@@ -472,18 +473,18 @@ module {
                                             case(#chunk(chunkData)){
                                                 Debug.print("found some Data");
                                                 //dataChunks := Array.append<PipelinifyTypes.AddressedChunk>(dataChunks, Array.make<PipelinifyTypes.AddressedChunk>(chunkData));
-                                                Candy.fileAddressedChunks(thisWorkspace, chunkData);
+                                                Workspace.fileAddressedChunks(thisWorkspace, chunkData);
                                                 chunkCount := chunkCount + 1;
                                             };
                                             case(#eof(chunkData)){
                                                 Debug.print("found some eof data");
-                                                Candy.fileAddressedChunks(thisWorkspace, chunkData);
+                                                Workspace.fileAddressedChunks(thisWorkspace, chunkData);
                                                 chunkCount := chunkCount + 1;
                                                 break dataRetrieve;
                                             };
                                             case(#parallel(chunkData)){
                                                 Debug.print("found some parallel data");
-                                                Candy.fileAddressedChunks(thisWorkspace, chunkData.2);
+                                                Workspace.fileAddressedChunks(thisWorkspace, chunkData.2);
                                                 chunkCount := chunkCount + 1;
                                                 break dataRetrieve;
                                             };
@@ -516,7 +517,7 @@ module {
                     //todo: maybe we require initialization
                     workspaceCache.put(pipeInstanceID, {
                         var status = #initialized;
-                        data = Candy.emptyWorkspace();
+                        data = Workspace.emptyWorkspace();
                     });
                     return #ok(#intakeNeeded{
                         pipeInstanceID = pipeInstanceID;
@@ -754,7 +755,7 @@ module {
                                 };
 
                                 //Debug.print("chunk data " # debug_show(chunkData[1]) # debug_show(chunkData[2]) # debug_show(chunkData[3]) # debug_show(chunkData[4]) # debug_show(chunkData[5]));
-                                Candy.fileAddressedChunks(thisCache.data, chunkData);
+                                Workspace.fileAddressedChunks(thisCache.data, chunkData);
                             };
 
 
@@ -766,7 +767,7 @@ module {
                                 Debug.print("hit EOF Chunk");
                                 thisCache.status := #doneLoading;
                                 //Debug.print("eof data " # debug_show(chunkData[1]) # debug_show(chunkData[2]) # debug_show(chunkData[3]) # debug_show(chunkData[4]) # debug_show(chunkData[5]) );
-                                Candy.fileAddressedChunks(thisCache.data, chunkData);
+                                Workspace.fileAddressedChunks(thisCache.data, chunkData);
 
                         };
                         case(#parallel(chunkData)){
@@ -776,7 +777,7 @@ module {
                                     let thisMap = Array.init<Bool>(chunkData.1,false);
                                     thisMap[chunkData.0] := true;
                                     thisCache.status := #loading(chunkData.0, chunkData.1, Array.freeze<Bool>(thisMap));
-                                    Candy.fileAddressedChunks(thisCache.data, chunkData.2);
+                                    Workspace.fileAddressedChunks(thisCache.data, chunkData.2);
                                     return #ok(#intakeNeeded{
                                         pipeInstanceID = _request.pipeInstanceID;
                                         currentChunks = chunkData.0;
@@ -790,7 +791,7 @@ module {
                                     let thisMap = Array.thaw<Bool>(loadingVal.2);
                                     thisMap[chunkData.0] := true;
                                     thisCache.status := #loading(chunkData.0,chunkData.1, Array.freeze<Bool>(thisMap));
-                                    Candy.fileAddressedChunks(thisCache.data, chunkData.2);
+                                    Workspace.fileAddressedChunks(thisCache.data, chunkData.2);
                                     Debug.print("map is " # debug_show(thisMap));
                                     return #ok(#intakeNeeded{
                                         pipeInstanceID = _request.pipeInstanceID;
@@ -998,7 +999,7 @@ module {
                     return #err({text="Cannot find response Cache for ID" # Nat32.toText(_request.pipeInstanceID); code= 13;});
                 };
                 case(?thisCache){
-                    let result = Candy.getWorkspaceChunk(thisCache.data, _request.chunkID, _request.chunkSize);
+                    let result = Workspace.getWorkspaceChunk(thisCache.data, _request.chunkID, _request.chunkSize);
                     switch(result.0){
                         case(#eof){
                             return #ok(#eof(result.1.toArray()));

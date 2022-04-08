@@ -1,4 +1,4 @@
-let upstream = https://github.com/dfinity/vessel-package-set/releases/download/mo-0.6.4-20210624/package-set.dhall sha256:3f4cffd315d8ee5d2b4b5b00dc03b2e02732345b565340b7cb9cc0001444f525
+let upstream = https://github.com/dfinity/vessel-package-set/releases/download/mo-0.6.21-20220215/package-set.dhall sha256:b46f30e811fe5085741be01e126629c2a55d4c3d6ebf49408fb3b4a98e37589b
 let Package =
     { name : Text, version : Text, repo : Text, dependencies : List Text }
 
@@ -6,7 +6,7 @@ let additions =
     [
    { name = "candy"
    , repo = "https://github.com/aramakme/candy_library.git"
-   , version = "v0.1.1"
+   , version = "v0.1.5"
    , dependencies = ["base"]
    },
    { name = "principal"
@@ -15,12 +15,20 @@ let additions =
    , dependencies = ["base"]
    }] : List Package
 
-let overrides =
-    [{
-    name = "base",
-    repo = "https://github.com/dfinity/motoko-base",
-    version = "dfx-0.7.2",
-    dependencies = [] : List Text
-  }] : List Package
+let
+  {- This is where you can override existing packages in the package-set
+
+     For example, if you wanted to use version `v2.0.0` of the foo library:
+     let overrides = [
+         { name = "foo"
+         , version = "v2.0.0"
+         , repo = "https://github.com/bar/foo"
+         , dependencies = [] : List Text
+         }
+     ]
+  -}
+  overrides =
+    [] : List Package
+
 
 in  upstream # additions # overrides
